@@ -46,6 +46,7 @@ dependencies:
   device_info_plus: ^11.3.3
   mansion: ^0.1.0+2
   intl: ^0.20.2
+  firebase_storage: ^12.4.5
 
 dev_dependencies:
   flutter_test:

