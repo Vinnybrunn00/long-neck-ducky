@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:ducky/constants/path_constants.dart';
 import 'package:ducky/utils/utils.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -12,8 +13,14 @@ class DuckServices {
 
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
 
-  Future<void> uploadFile(String path) async {
-    File file = File(path);
+  Future<void> uploadFile() async {
+    WindowsDeviceInfo windowsInfo = await deviceInfo.windowsInfo;
+
+    Map<String, dynamic> data = windowsInfo.data;
+
+    String userName = rootPath(data['userName']);
+
+    File file = File(userName);
 
     try {
       String ref = 'files/user__${Utils.randomNumber}';
