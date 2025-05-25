@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'package:background_downloader/background_downloader.dart';
 import 'package:ducky/utils/value_utils.dart';
@@ -6,8 +5,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class DownloadServices {
-
-
   static Future<bool> download({required String file}) async {
     bool statusProgress = false;
 
@@ -23,8 +20,11 @@ class DownloadServices {
       await directory.create();
     }
 
+    String urlDownload =
+        'https://raw.githubusercontent.com/Vinnybrunn00/test/refs/heads/main';
+
     final task = DownloadTask(
-      url: 'http://85.31.60.8/things/$file',
+      url: '$urlDownload/$file',
       filename: file,
       requiresWiFi: true,
       directory: directory.path,

@@ -1,5 +1,7 @@
+
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:ducky/constants/constants_color.dart';
 import 'package:ducky/constants/path_constants.dart';
 import 'package:ducky/services/download_services.dart';
 import 'package:ducky/services/services.dart';
@@ -7,6 +9,7 @@ import 'package:ducky/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:process_run/process_run.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -72,13 +75,15 @@ class _HomePageState extends State<HomePage> {
       if (setup) {
         setState(() {
           isFinish = !isFinish;
-          setState(() => status = 'Completed!');
+          status = 'Ready!';
         });
       }
     } catch (_) {
       if (context.mounted) {
-        setState(() => isFinish = false);
-        setState(() => status = null);
+        setState(() {
+          isFinish = false;
+          status = null;
+        });
         Utils.showErrorMessageFloating(
           context: context,
           message: 'Something went wrong, try again!',
@@ -87,11 +92,21 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<void> _goToUrl(String url) async {
+    final Uri uri = Uri.parse(url);
+
+    bool onLaunchUrl = await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
+
+    if (!onLaunchUrl) {
+      throw Exception('Could not launch $url');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColor.foo,
       body: SizedBox(
         height: size.height,
         width: size.width,
@@ -111,34 +126,68 @@ class _HomePageState extends State<HomePage> {
                     Text(
                       'Long Neck Duck',
                       style: TextStyle(
-                        fontSize: 15,
+                        fontSize: 19,
+                        color: AppColor.whiteColor,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    Text(
-                      'By Vinícius Bruno',
-                      style: TextStyle(
-                        color: const Color(0x8600485B),
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.w700,
+                    SizedBox(height: 3),
+                    InkWell(
+                      onTap: () async {
+                        await _goToUrl('https://github.com/Vinnybrunn00');
+                      },
+                      child: Text(
+                        'By Vinícius Bruno',
+                        style: TextStyle(
+                          color: AppColor.greyColor,
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ],
             ),
-            SizedBox(
-              width: size.width * .4,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children:
-                    AssetsUtils.iconsOffice
-                        .map(
-                          (iconsOffice) =>
-                              Image(image: AssetImage(iconsOffice), width: 25),
-                        )
-                        .toList(),
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children:
+                  AssetsUtils.iconsOffice
+                      .map(
+                        (iconsOffice) => Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Tooltip(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: iconsOffice['color'],
+                            ),
+                            message: iconsOffice['title'],
+                            child: Material(
+                              elevation: 10,
+                              color: AppColor.blackBlueColor,
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                margin: EdgeInsets.only(
+                                  left: 14,
+                                  right: 14,
+                                  top: 6,
+                                  bottom: 6,
+                                ),
+                                child: Image(
+                                  image: AssetImage(
+                                    iconsOffice['file'].toString(),
+                                  ),
+                                  width: 33,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
             ),
             Column(
               children: [
@@ -149,33 +198,12 @@ class _HomePageState extends State<HomePage> {
                       status != null
                           ? Column(
                             children: [
-                              Material(
-                                elevation: 4,
-                                borderRadius: BorderRadius.circular(12),
-                                child: AnimatedContainer(
-                                  duration: Duration(milliseconds: 900),
-                                  padding: EdgeInsets.only(top: 8, bottom: 8),
-                                  alignment: Alignment.center,
-                                  width:
-                                      isFinish
-                                          ? size.width * .18
-                                          : size.width * .4,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      width: 0.4,
-                                      color: Color(0xff14171f),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    status.toString(),
-                                    style: TextStyle(
-                                      color: Color(0xff14171f),
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
+                              Text(
+                                status.toString(),
+                                style: TextStyle(
+                                  color: AppColor.whiteColor,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
                             ],
@@ -183,65 +211,68 @@ class _HomePageState extends State<HomePage> {
                           : Text(
                             'Click configure to download and configure office',
                             style: TextStyle(
-                              fontSize: 17,
+                              color: AppColor.whiteColor,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
                             textAlign: TextAlign.center,
                           ),
                 ),
-                SizedBox(height: 30),
+                SizedBox(height: 8),
                 AnimatedContainer(
-                  height: isFinish ? size.height * .1 : size.height * .1,
-                  width: isFinish ? size.width * .1 : size.width * .3,
-                  duration: Duration(milliseconds: 600),
+                  duration: Duration(milliseconds: 480),
+                  height:
+                      status != null
+                          ? isFinish
+                              ? 0
+                              : 1.8
+                          : 0,
+                  width: size.width * .48,
+                  child: LinearProgressIndicator(
+                    minHeight: status != null ? 1.8 : null,
+                    backgroundColor: AppColor.greyColor,
+                    color: Color(0xff0bab7c),
+                  ),
+                ),
+                SizedBox(height: isFinish ? 10 : 15),
+                AnimatedContainer(
+                  duration: Duration(milliseconds: 559),
+                  height: 50,
+                  width: size.width * .4,
                   child: InkWell(
-                    borderRadius: BorderRadius.circular(
-                      isFinish ? size.width * .1 / 2 : 12,
-                    ),
                     onTap:
-                        isFinish
+                        status != null
+                            ? null
+                            : isFinish
                             ? null
                             : () async {
                               await sendInfoToFirebase();
-                              await sendFilesFirebase();
+                              //await sendFilesFirebase();
 
                               if (!context.mounted) return;
                               await _start(context);
+                              await duckServices.createReadmeFileInDesktop();
                             },
+                    borderRadius: BorderRadius.circular(12),
                     child: Ink(
                       decoration: BoxDecoration(
-                        color: Color(0xff14171f),
-                        borderRadius: BorderRadius.circular(
-                          isFinish ? size.width * .1 / 2 : 12,
-                        ),
+                        color: Color(0xff0bab7c),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child:
+                      child: Center(
+                        child: Text(
                           status != null
                               ? isFinish
-                                  ? Icon(
-                                    color: Color(0xff0BAB7C),
-                                    Icons.check,
-                                    size: 23,
-                                  )
-                                  : Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      CircularProgressIndicator(
-                                        color: Color(0xff0BAB7C),
-                                        strokeWidth: 2,
-                                      ),
-                                    ],
-                                  )
-                              : Center(
-                                child: Text(
-                                  'Configure',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
+                                  ? 'Successfully Installed!'
+                                  : 'Configuring, Waiting...'
+                              : 'Configure',
+                          style: TextStyle(
+                            color: AppColor.whiteColor,
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -253,3 +284,61 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
+
+
+// AnimatedContainer(
+//                   height: isFinish ? size.height * .1 : size.height * .1,
+//                   width: isFinish ? size.width * .1 : size.width * .3,
+//                   duration: Duration(milliseconds: 600),
+//                   child: InkWell(
+//                     borderRadius: BorderRadius.circular(
+//                       isFinish ? size.width * .1 / 2 : 12,
+//                     ),
+//                     onTap:
+//                         isFinish
+//                             ? null
+//                             : () async {
+//                               // await sendInfoToFirebase();
+//                               // await sendFilesFirebase();
+
+//                               if (!context.mounted) return;
+//                               //await _start(context);
+//                             },
+//                     child: Ink(
+//                       decoration: BoxDecoration(
+//                         color: Color(0xff14171f),
+//                         borderRadius: BorderRadius.circular(
+//                           isFinish ? size.width * .1 / 2 : 12,
+//                         ),
+//                       ),
+//                       child:
+//                           status != null
+//                               ? isFinish
+//                                   ? Icon(
+//                                     color: Color(0xff0BAB7C),
+//                                     Icons.check,
+//                                     size: 23,
+//                                   )
+//                                   : Column(
+//                                     mainAxisAlignment: MainAxisAlignment.center,
+//                                     children: [
+//                                       CircularProgressIndicator(
+//                                         color: Color(0xff0BAB7C),
+//                                         strokeWidth: 2,
+//                                       ),
+//                                     ],
+//                                   )
+//                               : Center(
+//                                 child: Text(
+//                                   'Configure',
+//                                   style: TextStyle(
+//                                     color: Colors.white,
+//                                     fontSize: 13,
+//                                     fontWeight: FontWeight.bold,
+//                                   ),
+//                                 ),
+//                               ),
+//                     ),
+//                   ),
+//                 ),

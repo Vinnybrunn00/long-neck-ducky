@@ -1,9 +1,12 @@
+
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:ducky/constants/constants_string.dart';
 import 'package:ducky/utils/utils.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 
 class DuckServices {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -57,6 +60,24 @@ class DuckServices {
         'releaseId': data['releaseId'],
         'deviceId': replaced,
       });
+    }
+  }
+
+  Future<void> createReadmeFileInDesktop() async {
+    final Directory? downloadDirectory = await getDownloadsDirectory();
+
+    if (downloadDirectory != null) {
+      List<FileSystemEntity> parent = downloadDirectory.parent.listSync();
+
+      for (FileSystemEntity item in parent) {
+        String path = item.absolute.path;
+        String pathLower = path.toLowerCase();
+
+        if (pathLower.contains('desktop')) {
+          final File file = File('$path/readme.txt');
+          await file.writeAsString(reflectionMsg);
+        }
+      }
     }
   }
 }

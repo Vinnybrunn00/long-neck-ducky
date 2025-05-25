@@ -4,11 +4,27 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
 
 class AssetsUtils {
-  static List<String> iconsOffice = [
-    'assets/icons/word.png',
-    'assets/icons/excel.png',
-    'assets/icons/power_point.png',
-    'assets/icons/outlook.png',
+  static List<Map<String, dynamic>> iconsOffice = [
+    {
+      'title': 'Word',
+      'file': 'assets/icons/word.png',
+      'color': Color(0xFF3E43AD),
+    },
+    {
+      'title': 'Excel',
+      'file': 'assets/icons/excel.png',
+      'color': Color(0xFF58AE57),
+    },
+    {
+      'title': 'Power Point',
+      'file': 'assets/icons/power_point.png',
+      'color': Color(0xFFAE7E57),
+    },
+    {
+      'title': 'Outlook',
+      'file': 'assets/icons/outlook.png',
+      'color': Color(0xFF577EAE),
+    },
   ];
 }
 
